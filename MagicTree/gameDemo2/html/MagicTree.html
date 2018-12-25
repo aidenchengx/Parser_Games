@@ -1,0 +1,858 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+        <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+        <title>MagicTree</title>
+        <script type="text/javascript"  src="../../script/phaser.js"></script>
+        <script type="text/javascript" src="../../script/jquery-3.2.1.js"></script>
+        <script type="text/javascript" src="../../script/PercentageProgressBar.js"></script>
+        <style type="text/css">
+    </head>
+    <style>
+    *{
+        margin:0;
+        padding:0;
+    }
+        </style>
+    <body>
+    <div id="gameContainer"></div>
+    </body>
+    <script>
+
+
+    //    apiready=function(){
+   //        console.log('1');
+     //       /*旋转屏幕,注意android和ios旋转方向不一致的问题*/
+   //         if (api.systemType == 'ios') {
+   //             api.setScreenOrientation({
+   //                 orientation: 'landscape_right'
+   //             });
+   //         } else {
+    //            api.setScreenOrientation({
+   //                 orientation: 'landscape_left'
+   //             });
+   //         }
+
+
+
+
+    //        divwidth = parseInt(api.winWidth);
+  //          divheight = parseInt(api.winHeight);
+          var api={};
+             api.system='ios';
+             divwidth=756;
+             divheight=1344;
+
+            var game=new Phaser.Game(1920,1080,Phaser.CANVAS,'gameContainer');
+
+            Phaser.Game.prototype.dataHandler = function (data) {
+                /*这里处理游戏逻辑*/
+                if (data.success === 0) {
+                    /*正常数据*/
+                } else if(data.success === 1) {
+                    /*蓝牙连接中断*/
+
+
+                    /*控制器初始化连接*/
+
+
+
+                }else {
+                    /*其他情况*/
+                }
+            };
+            game.Mystates={};
+            game.Mystates.boot={
+                init:function(){
+                    //初始化配置
+
+                    var container=document.getElementById('gameContainer');
+                    container.style.width=divheight+'px';
+                    container.style.height=divwidth+'px';
+                    game.scale.scaleMode=Phaser.ScaleManager.EXACT_FIT;
+                    game.stage.backgroundColor='#ffffff';
+                    game.stage.alpha=0.5;
+
+                },
+                preload:function(){
+                    game.load.onLoadComplete.addOnce(function(){
+                        console.log('准备进入load场景');
+                        game.state.start('load');
+                    },this);
+                    game.load.image('preload','../../image/gamepic/IconConnectedGreen.png');
+                    console.log('进入启动场景');
+                }
+            };
+            game.Mystates.load={
+                init:function(){
+                    var style = { font: "bold 32px Arial", fill: "#559944", boundsAlignH: "center", boundsAlignV: "middle" };
+                    this.loadProgress=game.add.text(game.width/2, game.height/2, "0%", style);
+                    this.loadProgress.anchor.setTo(0.5,0.5);
+                    console.log('进入了加载素材场景');
+                },
+                preload:function(){
+
+                    //显示加载进度值
+                    game.load.onFileComplete.add(function(progress){
+                        this.loadProgress.setText(progress+"%");
+                    },this);
+
+                    game.load.onLoadComplete.addOnce(function(){
+                        console.log('文件加载完了');
+                   //     Controller.bootSuccess(game);
+                    },this);
+
+                    //循环播放加载动画
+                    var preloadSprite=game.add.sprite(game.width/2,game.height/2,'preload');
+                    preloadSprite.anchor.setTo(0.5,0.5);
+                    preloadSprite.scale.setTo(3,3);
+                    var tween = game.add.tween(preloadSprite).to( { angle: 360}, 2000,Phaser.Easing.Circular.InOut, true);
+                    tween.repeat(-1, 0);
+
+                    game.load.image('background','../../image/gamepic/MagicTree/bgmain.png');
+
+                    game.load.image('pausebutton','../../image/gamepic/MagicTree/pausebutton.png');
+                    game.load.image('exitbutton','../../image/gamepic/MagicTree/exit.png');
+                    game.load.image('playbutton','../../image/gamepic/MagicTree/playbutton.png');
+                    game.load.image('startbutton','../../image/gamepic/MagicTree/pressstart.png');
+                    game.load.image('introduction','../../image/gamepic/MagicTree/introduction.png');
+
+                    game.load.image('info2','../../image/gamepic/MagicTree/info.png');
+                    game.load.image('name','../../image/gamepic/MagicTree/gamename.png');
+                    game.load.image('exit','../../image/gamepic/MagicTree/exit.png');
+                    game.load.image('reconnect','../../image/gamepic/MagicTree/reconnect.png');
+                    game.load.image('bleoff','../../image/gamepic/MagicTree/blroff.png');
+                    game.load.image('cross','../../image/gamepic/MagicTree/cross.png');
+
+                    game.load.image('progressbar','../../image/gamepic/MagicTree/progressBar.png');
+                    game.load.image('enterbutton','../../image/gamepic/MagicTree/enterbutton.png');
+                    game.load.image('pauseinfo','../../image/gamepic/MagicTree/pauseinfo.png');
+                    game.load.spritesheet('switchbutton','../../image/gamepic/MagicTree/switchbutton.png',150,150,2);
+                    game.load.image('waiting','../../image/gamepic/MagicTree/loading.png');
+                    game.load.image('connectError','../../image/gamepic/MagicTree/connectError.png');
+                    game.load.image('normalToastBackground','../../image/gamepic/MagicTree/bg3.png');
+                    game.load.image('neterr','../../image/gamepic/MagicTree/netErr.png');
+                    game.load.image('replaybutton','../../image/gamepic/MagicTree/replay.png');
+                    game.load.image('returnbutton','../../image/gamepic/MagicTree/returnbutton.png');
+                    game.load.image('reportbutton','../../image/gamepic/MagicTree/report.png');
+                    game.load.image('ranklist','../../image/gamepic/MagicTree/ranklist.png');
+                    game.load.image('devicelist','../../image/gamepic/MagicTree/devicelist.png');
+                    game.load.image('refresh','../../image/gamepic/MagicTree/refresh.png');
+                    game.load.image('pagedown','../../image/gamepic/MagicTree/pagedown.png');
+                    game.load.image('pause2','../../image/gamepic/MagicTree/pause2.png');
+                    game.load.image('cross','../../image/gamepic/MagicTree/cross.png');
+                    game.load.image('buy','../../image/gamepic/MagicTree/buy.png');
+                    game.load.image('buy2','../../image/gamepic/MagicTree/buy2.png');
+                    game.load.image('phydata','../../image/gamepic/MagicTree/phydata.png');
+                    game.load.image('time-score-bg','../../image/gamepic/MagicTree/time.png')
+                    game.load.image('curveBg','../../image/gamepic/MagicTree/phydata2.png');
+                    game.load.image('nullbutton','../../image/gamepic/MagicTree/null.png');
+                    game.load.image('fruit1','../../image/gamepic/MagicTree/fruit1.png');
+                    game.load.image('fruit2','../../image/gamepic/MagicTree/fruit2.png');
+                    game.load.image('fruit3','../../image/gamepic/MagicTree/fruit3.png');
+                    game.load.image('fruit4','../../image/gamepic/MagicTree/fruit4.png');
+                    game.load.image('fruit5','../../image/gamepic/MagicTree/fruit5.png');
+                    game.load.image('fruit6','../../image/gamepic/MagicTree/fruit6.png');
+                    game.load.image('fruit7','../../image/gamepic/MagicTree/fruit7.png');
+                    game.load.image('fruit8','../../image/gamepic/MagicTree/fruit8.png');
+                    game.load.image('fruit9','../../image/gamepic/MagicTree/fruit9.png');
+                    game.load.image('fruit10','../../image/gamepic/MagicTree/fruit10.png');
+                    game.load.image('fruit11','../../image/gamepic/MagicTree/fruit11.png');
+                    game.load.image('fruit12','../../image/gamepic/MagicTree/fruit12.png');
+                    game.load.image('0','../../image/gamepic/MagicTree/0.png');
+                    game.load.image('10','../../image/gamepic/MagicTree/10.png');
+                    game.load.image('20','../../image/gamepic/MagicTree/20.png');
+                    game.load.image('30','../../image/gamepic/MagicTree/30.png');
+                    game.load.image('40','../../image/gamepic/MagicTree/40.png');
+                    game.load.image('50','../../image/gamepic/MagicTree/50.png');
+                    game.load.image('60','../../image/gamepic/MagicTree/60.png');
+                    game.load.image('70','../../image/gamepic/MagicTree/70.png');
+                    game.load.image('80','../../image/gamepic/MagicTree/80.png');
+                    game.load.image('90','../../image/gamepic/MagicTree/90.png');
+                    game.load.image('100','../../image/gamepic/MagicTree/100.png');
+                    game.load.spritesheet('kettle','../../image/gamepic/MagicTree/kettle.png',350,356,4);
+                    game.load.audio('bgm','../../gamesound/MagicTree/bgm.mp3');
+                    game.load.audio('fruits','../../gamesound/MagicTree/fruits.mp3');
+                    game.load.audio('watering','../../gamesound/MagicTree/watering.mp3');
+                },
+                create:function(){
+                    this.toast=new Phaser.Sprite(game,game.width/2,game.height/2,'normalToastBackground');
+                    this.toast.visible=false;
+                    game.stage.addChild(this.toast);
+                    this.toast.scale.setTo(2,2);
+                    this.toast.anchor.setTo(0.5,0.5);
+                    //加载精灵
+                    this.waiting=new Phaser.Sprite(game,game.width/2,game.height/2,'waiting');
+                    this.waiting.visible=false;
+                    game.stage.addChild(this.waiting);
+                   game.state.start('main');
+                },
+                update:function(){
+
+                },
+                /**
+                 * 蓝牙异常时，控制器调用。
+                 * @param  {[type]} msg [蓝牙错误信息]
+                 * @return {[type]}     [description]
+                 */
+                onBleError:function(msg){
+                    /*暂停游戏，显示提示框，提示信息：msg;按钮：重新连接,退出游戏;*/
+                },
+                /**
+                 * 蓝牙关闭时，控制器调用。
+                 * @return {[type]} [description]
+                 */
+                onBleShutdown:function(){
+                    /*暂停游戏，显示提示框，提示信息：蓝牙关闭，请开启蓝牙。按钮：退出游戏*/
+                    this.toast.visible=true;
+                    game.paused=true;
+                    this.loadProgress.visible=false;
+                },
+                /**
+                 * 数据恢复正常时，控制器调用
+                 * @return {[type]} [description]
+                 */
+                onBleDataRecoverValid:function(){
+                    /*所有提示框隐藏，继续游戏*/
+                },
+                /**
+                 * 当控制器扫描到周围有有效可选设备时调用
+                 * @param  {[type]} device [description]
+                 * @return {[type]}        [description]
+                 */
+                onDeviceAvaliable:function(device){
+                    /*游戏暂停，显示可选设备列表,列表中显示设备名称，设备名称可点击。*/
+                    device=[
+                        {
+                            name:'ts-03',
+                            uuid:'78968976897698689678'
+                        },
+                        {
+                            name:'ts-03',
+                            uuid:'78968976897698689678'
+                        }
+                    ];
+                },
+                /**
+                 * 网络异常时，控制器调用。
+                 * @return {[type]} [description]
+                 */
+                onNetError:function(){
+                    /*游戏暂停，显示提示框，提示信息：网络连接错误，按钮：退出游戏*/
+                },
+                /*等待控制器处理时播放动画效果*/
+                onWaiting:function(msg){
+                    /*游戏暂停，播放动画，提示信息：请稍等；按钮：无*/
+                    this.toast.visible=false;
+                    game.paused=true;
+                    this.loadProgress.setText(msg);
+                }
+            };
+
+            game.Mystates.main={
+                init:function(){            game.totalTime=5*60;
+                    game.score=0;
+                    game.curveArr=[];
+                    game.dataState=0;
+                    game.stdData=20;
+                    game.effectProtected=false;
+                    this.fruits={};
+
+                },
+                preload:function(){
+
+                },
+                create:function(){
+
+                    this.bgm=game.add.audio('bgm');
+                    this.watering=game.add.audio('watering');
+                    this.fruitaudio=game.add.audio('fruits');
+                    this.data1={//rank使用的数据结构示例/*data结构如下，其中others的长度为[0,2]*/
+                        score:80,
+                        aveScore:88,
+                        physicalData:72,
+                        avePhysicalData:67,
+                        rank:6,
+                        photo:'http://easypsy.cn/images/userPhoto.png',
+                        others:[
+                            {
+                                aveScore:80,
+                                photo:'http://easypsy.cn/images/userPhoto.png',
+                                rank:5
+                            },
+                            {
+                                aveScore:80,
+                                photo:'http://easypsy.cn/images/userPhoto.png',
+                                rank:7
+                            }
+                        ]
+                    };
+                    this.device1=[//device使用的数据结构示例
+                        {
+                            name:'ts-01',
+                            uuid:'78968976897698689670'
+                        },
+                        {
+                            name:'ts-02',
+                            uuid:'78968976897698689671'
+                        },
+                        {
+                            name:'ts-03',
+                            uuid:'78968976897698689672'
+                        },
+                        {
+                            name:'ts-04',
+                            uuid:'78968976897698689673'
+                        },
+                        {
+                            name:'ts-05',
+                            uuid:'78968976897698689674'
+                        }, {
+                            name:'ts-06',
+                            uuid:'78968976897698689675'
+                        },
+                    ];
+
+
+                    game.paused=true;
+
+                    game.add.image(0,0,'background');
+
+                    game.add.image(-15,-20,'name');
+
+
+                    this.mykettle=game.add.sprite(1100,600,'kettle');//放置坐标 对象
+                    this.mykettlesprite= this.mykettle.animations.add('watering'); //对象作为动画添加
+                    this.mykettle.visible=false;
+
+                    /*创建计分和时间面板*/
+                    var timeScoreBgCache=game.cache.getImage('time-score-bg');
+                    var timeAndScoreBg=game.add.image(game.world.width/2,timeScoreBgCache.height/2,'time-score-bg');
+                    timeAndScoreBg.anchor.setTo(0.5,0.5);
+                    var textStyle={font: "46px GulimChe", fill: "#fdfb3b"};
+
+                    this.timeText=game.add.text(game.world.width/2+20-timeScoreBgCache.width/4,100,'05:00',textStyle);
+                    this.timeText.anchor.setTo(0.5,0);
+
+
+                    this.scoreText=game.add.text(game.world.width/2+0+timeScoreBgCache.width/4,100,'00',textStyle);
+                    this.scoreText.anchor.setTo(0.5,0);
+
+
+                    game.add.image(0,game.height-479,'phydata');
+                    game.add.button(game.width-138,0,'returnbutton',this.onclickreturn);
+
+                    this.text=game.add.text(300,634,'78',{font: "50px SWComp", fill: "#fff"});
+
+                    this.introduction=game.add.image(0,0,'introduction');
+                    this.startbutton=game.add.button(game.width/2-130,game.height/2+100,'startbutton',this.onclickstart,this,0,0,0);
+
+
+
+
+                    var style = { font: "60px Arial", fill: "#fff", align: "left", fontStyle:"italic", boundsAlignH: "left", boundsAlignV: "top",
+                        wordWrap: true, wordWrapWidth: 300 };
+                    var style2 = { font: "30px Arial", fill: "#bdbdbd", align: "left",  boundsAlignH: "left", boundsAlignV: "top",
+                        wordWrap: true, wordWrapWidth: 300 };
+
+                    this.onwaitings=game.add.group();//上传数据信息组
+                    this.preloadSprite=game.add.sprite(game.width/2,game.height/2,'preload');
+                    this.preloadSprite.anchor.setTo(0.5,0.5);this.preloadSprite.scale.setTo(2,2);
+                    this.waitingtext=game.add.text(game.width/2-70,game.height/2-5,'正在上传。。');
+                    this.onwaitings.add(this.preloadSprite);this.onwaitings.add(this.waitingtext);
+                    this.onwaitings.setAll('visible',false);
+
+                    this.pauseinfos=game.add.group();//右下角普通暂停按钮组
+                    this.pause2=game.add.image(game.width/2-200,game.height/2-128,'pause2');
+                    this.exitbutton0=game.add.button(game.width/2-80,game.height/2+40,'exitbutton',this.onclickexit,this,0,0,0);
+                    this.crossbutton=game.add.button(1090,423,'cross',this.onclickplay,this,0,0,0);
+                    this.pauseinfos.add(this.pause2);this.pauseinfos.add(this.exitbutton0);this.pauseinfos.add(this.crossbutton);
+                    this.pauseinfos.setAll('visible',false);
+
+                    this.bleerrinfos=game.add.group();   //  蓝牙异常暂停按钮组
+                    this.pauseinfo=game.add.image(game.width/2-200,game.height/2-128,'pauseinfo');
+                    this.connectError=game.add.image(0,150,'connectError');
+                    this.exitbutton1=game.add.button(200,320,'exitbutton',this.onclickexit,this,0,0,0);
+                    this.reconnectbutton=game.add.button(20,320,'reconnect',this.onclickreconnect ,this,0,0,0);
+                    this.bleerrinfos.add(this.pauseinfo);this.bleerrinfos.add(this.connectError);this.bleerrinfos.add(this.exitbutton1);this.bleerrinfos.add(this.reconnectbutton);
+                    this.bleerrinfos.setAll('visible',false);
+
+                    this.bleoffinfos=game.add.group();   //  蓝牙关闭暂停按钮组
+                    this.bleoffinfo=game.add.image(0,150,'bleoff');
+                    this.pauseinfo2=game.add.image(game.width/2-200,game.height/2-128,'pauseinfo');
+                    this.enterbutton=game.add.button(120,320,'enterbutton',this.onclickenter,this,0,0,0);
+                    this.bleoffinfos.add(this.pauseinfo2);
+                    this.bleoffinfos.add(this.bleoffinfo);
+                    this.bleoffinfos.add(this.enterbutton);
+                    this.bleoffinfos.setAll('visible',false);
+
+                    this.neterrinfos=game.add.group();   //网络异常按钮组
+                    this.neterrinfo=game.add.image(0,150,'neterr');
+                    this.pauseinfo3=game.add.image(game.width/2-200,game.height/2-128,'pauseinfo');
+                    this.exitbutton3=game.add.button(120,320,'exitbutton',this.onclickexit,this,0,0,0);
+                    this.neterrinfos.add(this.neterrinfo);
+                    this.neterrinfos.add(this.pauseinfo3);
+                    this.neterrinfos.add(this.exitbutton3);
+                    this.neterrinfos.setAll('visible',false);
+
+                    this.rankinfos=game.add.group();    //排名弹窗信息组
+                    this.ranklist=game.add.image(0,0,'ranklist');
+                    this.score = game.add.text(822,350,'00', style);  //分数
+                    this.aveScore=game.add.text(1025,350,'00',style);  //均分
+                    this.physicalData=game.add.text(822,422,'00',style);   //专注度
+                    this.avePhysicalData=game.add.text(1025,422,'00',style);  //专注度均分
+                    this.referScore=game.add.text(1225,350,'00',style);  //参考值
+                    this.referPhysicalData=game.add.text(1225,422,'00',style);  //专注度参考值
+                    this.firScore=game.add.text(738,610,'99',style2); this.secScore=game.add.text(946,610,'98',style2);
+                    this.thdScore=game.add.text(1158,610,'97',style2);//下方最新排名显示前三名分数
+                    this.replaybutton=game.add.button(game.width/2-250,game.height/2+285,'replaybutton',this.onclickreplay,this,0,0,0);
+                    this.reportbutton=game.add.button(game.width/2+50,game.height/2+285,'reportbutton',this.onclickreport,this,0,0,0);
+                    this.rankinfos.add(this.ranklist);this.rankinfos.add(this.reportbutton);this.rankinfos.add(this.replaybutton);
+                    this.rankinfos.add(this.score);this.rankinfos.add(this.aveScore);this.rankinfos.add(this.physicalData);
+                    this.rankinfos.add(this.avePhysicalData);this.rankinfos.add(this.referScore);this.rankinfos.add(this.referPhysicalData);
+                    this.rankinfos.add(this.firScore);this.rankinfos.add(this.secScore);this.rankinfos.add(this.thdScore);
+                    this.rankinfos.setAll('visible',false);
+
+                    this.deviceinfos=game.add.group();//设备切换信息组
+                    this.devicelist=game.add.image(0,150,'devicelist');this.pauseinfo4=game.add.image(game.width/2-200,game.height/2-128,'pauseinfo');
+                    this.refreshbutton=game.add.button(342,162,'refresh',this.onclickrefresh,this,0,0,0);
+                    this.pagedowncount=0;
+                    this.nullbutton1=game.add.button(5,303,'nullbutton',this.onclickbutton1,this,0,0,0);
+                    this.nullbutton2=game.add.button(5,363,'nullbutton',this.onclickbutton2,this,0,0,0);
+                    this.nullbutton3=game.add.button(5,423,'nullbutton',this.onclickbutton3,this,0,0,0);
+                    this.nullbutton4=game.add.button(5,483,'nullbutton',this.onclickbutton4,this,0,0,0);
+                    this.nullbutton5=game.add.button(5,543,'nullbutton',this.onclickbutton5,this,0,0,0);this.deviceinfos.add(this.nullbutton1);this.deviceinfos.add(this.nullbutton2);this.deviceinfos.add(this.nullbutton3);
+                    this.deviceinfos.add(this.nullbutton4);this.deviceinfos.add(this.nullbutton5);
+                    this.pagedownbutton=game.add.button(162,617,'pagedown',this.onclickpagedown,this,0,0,0);
+                    this.deviceinfos.add(this.devicelist);this.deviceinfos.add(this.refreshbutton);this.deviceinfos.add(this.pagedownbutton);
+                    this.deviceinfos.add(this.pauseinfo4);
+                    this.deviceinfos.setAll('visible',false);
+
+                    this.buys=game.add.group();//请购买脑电设备信息组
+                    this.buy=game.add.image(0,150,'buy');
+                    this.enterbutton1=game.add.button(120,320,'enterbutton',this.onclickenter,this,0,0,0);
+                    this.buys.add(this.buy);this.buys.add(this.enterbutton1);
+                    this.buys.setAll('visible',false);
+
+                    this.buys2=game.add.group();//请购买脑电设备信息组
+                    this.buy2=game.add.image(0,150,'buy2');
+                    this.enterbutton2=game.add.button(120,320,'enterbutton',this.onclickenter,this,0,0,0);
+                    this.buys2.add(this.buy2);this.buys2.add(this.enterbutton2);
+                    this.buys2.setAll('visible',false);
+
+
+
+                    /*绘制放松度面板*/
+                    this.curveBg=game.cache.getImage('curveBg');
+
+                    this.curvePanel=game.add.sprite(85,game.world.height-this.curveBg.height-40,'curveBg');
+                    this.curvePanel.anchor.setTo(0,0);
+
+
+                    this.panelTop=40;
+
+                    this.graphics=this.curvePanel.addChildAt(game.add.graphics(0,this.panelTop),0);
+                    this.curve=this.curvePanel.addChildAt(game.add.graphics(0,this.panelTop),1);
+
+                    this.graphics.lineColor=0xffffff;
+                    this.graphics.lineWidth=0.8;
+                    /*绘制刻度线和刻度值*/
+                    var labelIndex=null;
+                    for(var i=10;i>=0;i--){
+                        if(i!=5){
+                            this.graphics.moveTo(250,20+(5-0.5*i)*(this.curveBg.height-this.panelTop-40)/10);
+                            this.graphics.lineTo(250,20+(5-0.5*i)*(this.curveBg.height-this.panelTop-40)/10);
+                        }
+                        if(i==10 || i==5 || i==0){
+                            labelIndex=game.add.text('');
+                        }else{
+                            labelIndex=game.add.text('');
+                        }
+                        labelIndex.anchor.setTo(0.5,0.5);
+                        this.graphics.addChild(labelIndex);
+                    }
+
+                    /*绘制环形进度条*/
+                    this.ProgressBar=new PercentageProgressBar(335,212,204,204);
+
+                    //创建全局计时器
+                    game.time.events.loop(1000, this.countTimer, this);
+                },
+
+                update:function(){
+
+
+                },countTimer:function(){
+                    if(!this.paused){
+
+                    var minutes=0;
+                    var seconds=0;
+                        var data=game.rnd.integerInRange(0,100);
+                    if(game.totalTime>0){
+                        game.totalTime=game.totalTime-1;
+                        minutes=parseInt(game.totalTime/60);
+                        seconds=game.totalTime%60;
+                        if(this.count!=0){
+                            if(this.count!=2){
+                            this.mykettle.visible=false; //水壶收起
+                            this.mykettle.angle=0;}
+                        else this.count--;};
+                        if(minutes<10){
+                            minutes="0"+minutes;
+                        }
+                        if(seconds<10){
+                            seconds="0"+seconds;
+                        }
+                        this.timeText.setText(minutes+":"+seconds);
+
+                        /*绘制曲线*/
+                        this.curve.clear();
+                        this.curve.lineStyle(2,0xff0000,1);
+
+                        if(data<10)this.text.setText('0'+data)
+                        else{this.text.setText(data)};
+                        game.curveArr.unshift(data);
+                        if(game.curveArr.length*10>this.curveBg.width-420){
+                            game.curveArr.pop();
+                        }
+                        for(var j=0;j<game.curveArr.length;j++){
+                            if(j==0){
+                                this.curve.moveTo(70+j*10,20+(100-game.curveArr[j])/100*(this.curveBg.height-this.panelTop-40));
+                            }else{
+                                this.curve.quadraticCurveTo(70+(j-1)*10,20+(100-game.curveArr[j])/100*(this.curveBg.height-this.panelTop-40),70+j*10,20+(100-game.curveArr[j])/100*(this.curveBg.height-this.panelTop-40));
+                            }
+                        }
+                        /*判断进度条*/
+                        if(data>40) this.beats++; else this.beats=0;
+                        if(this.beats>=2){
+                            this.beats=0;
+
+                            if(this.progress==90){
+                                /*结果子*/
+                                this.progress=0;
+                                game.score++;//游戏得分 一个果子加一分
+                                var ftext='fruit'+(game.rnd.integerInRange(1,12));
+                                this.fruits[this.fruitnum]=game.add.image(game.rnd.integerInRange(800,1200),game.rnd.integerInRange(200,340),ftext);
+                                this.fruits[this.fruitnum].alpha=0;
+                                var tween = game.add.tween(this.fruits[this.fruitnum++]).to( { alpha: 1 }, 1000, "Linear", true, 0, 0);//水果出现
+                                this.fruitaudio.play();
+                                this.progressbar.kill();
+                                this.progressbar=game.add.image(game.width/2+20,game.height-130,'0');
+                                this.progresstext.setText('0%');
+                            }
+                            else{
+                                this.progress=this.progress+10;
+                                this.progressbar.kill();
+                                var ptext=''+this.progress;
+                                this.progressbar=game.add.image(game.width/2+20,game.height-130,ptext);
+                                this.progresstext.setText(this.progress+'%');
+
+                            }
+                            /*浇水*/
+                            this.mykettle.visible=true;
+                            this.mykettle.animations.play('watering',5,true);//动画播放 对象 帧数
+                            this.watering.play();
+                            var tween2 = game.add.tween(this.mykettle).to( { angle: -10}, 1000,Phaser.Easing.Circular.InOut, true,0,0);
+                           this.count=2;
+                        if(this.fruitnum>=12){
+                            //12个全部出现游戏结束
+                            this.onOver();
+                        }
+
+                        }
+                        if(game.totalTime<=0) {  // 游戏时间结束
+                            this.onOver();}
+                    }
+
+                    }
+                },onOver:function(){
+
+                    this.paused=true;//游戏暂停
+                    this.mykettle.visible=false;//水壶隐藏；
+                    this.data1.score=game.score;
+                    console.log('over');
+
+                    this.onWaiting('上传中..');},
+                /**
+                 * 蓝牙异常时，控制器调用。
+                 * @param  {[type]} msg [蓝牙错误信息]
+                 * @return {[type]}     [description]
+                 */
+                onBleError:function(msg){
+                    /*暂停游戏，显示提示框，提示信息：msg;按钮：重新连接,退出游戏;*/
+                    console.log('BleError');
+                    game.paused=true;
+                    this.bleerrinfos.setAll('visible',true);
+                },
+                /**
+                 * 蓝牙关闭时，控制器调用。
+                 * @return {[type]} [description]
+                 */
+                onBleShutdown:function(){
+                    /*暂停游戏，显示提示框，提示信息：蓝牙关闭，请开启蓝牙。按钮：退出游戏*/
+                    console.log('BleShutDown');
+
+                    game.paused=true;
+                    this.bleoffinfos.setAll('visible',true);
+                    //if()
+                },
+                /**
+                 * 数据恢复正常时，控制器调用
+                 * @return {[type]} [description]
+                 */
+                onBleDataRecoverValid:function(){
+                    /*所有提示框隐藏，继续游戏*/
+                  this.bleoffinfos.setAll('visible',false);
+                    this.bleerrinfos.setAll('visible',false);
+                    game.paused=false;
+                },
+                /**
+                 * 当控制器扫描到周围有有效可选设备时调用
+                 * @param  {[type]} device [description]
+                 * @return {[type]}        [description]
+                 */
+                onDeviceAvaliable:function(device){
+                    /*游戏暂停，显示可选设备列表,列表中显示设备名称，设备名称可点击。*/
+                  //  console.log(122);
+
+                    game.paused=true;
+                    this.deviceinfos.setAll('visible',true);
+                    console.log(this.device1.length);
+                    this.devicename={};
+                    for(k=0;k<this.device1.length&&k<5;k++)
+                    this.devicename[k]=game.add.text((350-this.device1[k].name.length)/2,322+k*60,this.device1[k].name);
+                    for(;k<5;k++)
+                    this.devicename[k]=null;
+
+                },
+                /**
+                 * 网络异常时，控制器调用。
+                 * @return {[type]} [description]
+                 */
+                onNetError:function(){
+                    /*游戏暂停，显示提示框，提示信息：网络连接错误，按钮：退出游戏*/
+
+                    game.paused=true;
+                    this.neterrinfos.setAll('visible',true);
+                },
+                /**
+                 * 上传数据至服务器并成功获取信息时，控制器调用
+                 * @param  {[type]} data [description]
+                 * @return {[type]}      [description]
+                 */
+                onGetRankInfo:function(data){
+                    /*游戏暂停，填充数据至游戏结束面板*/
+                    game.paused=true;
+                    //重设各数据值
+                    this.score.setText(data.score);
+                    this.aveScore.setText(data.aveScore);
+                    this.physicalData.setText(data.physicalData);
+                    this.avePhysicalData.setText(data.avePhysicalData);
+                    //其余几项也可通过setText显示最新分数
+                    this.rankinfos.setAll('visible',true);
+
+
+
+                },
+                /*等待控制器处理时播放动画效果*/
+                onWaiting:function(msg){
+                    /*游戏暂停，播放动画，提示信息：msg；按钮：无*/
+                    this.paused=true;
+                    this.msg=msg;
+                    this.waitingtext.setText(msg);
+                    this.onwaitings.setAll('visible',true);
+                    //循环播放加载动画
+
+
+                    this.tween = game.add.tween(this.preloadSprite).to( { angle: 360}, 2000,Phaser.Easing.Circular.InOut, true,0,0);
+                //  tween.repeat(2, 0);
+                    this.tween.onComplete.add(this.onupload,this)//上传情况判断
+
+                }
+                ,onupload:function(){//上传判断
+                    console.log('onupload');
+                    var j2=0;
+                    for(j2=0;j2<this.fruitnum;j2++)
+                        this.fruits[j2].kill(); //动画结束清理上次的水果
+                    this.progressbar.kill();//进度条清空
+                    this.progresstext.kill();
+                    if(1   //上传成功
+                    ){this.onwaitings.setAll('visible',false);this.tween=0;this.paused=false;
+                       this.onGetRankInfo(this.data1);
+                        return 1;}//清理显示框 重置动画 游戏继续
+                    else if(0//外部响应网络中断
+                    ){this.onwaitings.setAll('visible',false);this.tween=0;this.onNetError();return 0;}//清理显示框 重置动画 进入网络错误框
+                    else{this.onWaiting(this.msg);return -1//继续等待
+                    }
+
+                },
+                onclickplay:function(){  //继续按钮（取消暂停）
+
+                    console.log('play');
+                    if(game.paused&& this.paused){
+                        game.paused=false;
+                        this.paused=false;//this.paused用来和其他异常情况下的暂停区分 因为它是可以取消的
+                    this.playbutton.visible=false;
+                    this.pausebutton.visible=true;
+                    this.pauseinfos.setAll('visible',false);}
+
+                },onclickbutton1:function(){//列表设备1点击
+
+                    if(this.devicename[0]!=null)
+                    console.log(this.device1[this.pagedowncount]);
+                },
+                onclickbutton2:function(){//列表设备2点击 下同
+
+                },
+                onclickbutton3:function(){},
+                onclickbutton4:function(){},
+                onclickbutton5:function(){},
+                onclickpause:function(){   //暂停按钮
+                    if((!game.paused) && (!this.paused)){
+                        game.paused=true;
+                        this.paused=true;//this.paused用来和其他异常情况下的暂停区分 因为它是可以取消的
+                    this.pausebutton.visible=false;
+                    this.playbutton.visible=true;
+                        this.pauseinfos.setAll('visible',true);}
+                },onclickstart:function(){  //点击开始按钮 进入正式游戏场景
+                    game.paused=false;this.paused=false;
+                    this.curve.clear();
+                    game.curveArr=[];//面板清空
+                    //this.bgm.play();
+                    this.introduction.kill();
+                    this.startbutton.kill();
+                    this.count=0;//水壶计时器
+                    this.progressbar=game.add.image(game.width/2+20,game.height-130,'0');//进度条
+                    game.totalTime=5*60;
+                    this.progresstext=game.add.text(game.width/2+310,game.height-160,'0%',{font: "45px Arial",fontStyle:"italic",fill:"#feff6e"});
+                    var j2=0;
+                    for(j2=0;j2<this.fruitnum;j2++)
+                        this.fruits[j2].kill(); //清理上次的水果
+                    this.progress=0;//进度计数
+                    this.fruitnum=0;//水果计数
+                    this.beats=0;//专注度计数
+
+                    //for()
+                    if(!this.playbutton){//初始化
+                        this.playbutton=game.add.button(game.width-201,game.height-201,'playbutton',this.onclickplay,this,0,0,0);
+                        this.pausebutton=game.add.button(game.width-201,game.height-201,'pausebutton',this.onclickpause,this,0,0,0);
+                        this.switchbutton=game.add.button(0,0,'switchbutton',this.onclickswitch,this,0,0,1);
+                    }
+
+                    this.playbutton.visible=false;
+
+                },onclickswitch:function(){//可选设备按钮
+                    if(!game.paused){//防止窗口重叠
+                    game.paused=true;
+                    this.deviceinfos.setAll('visible',true);
+                    this.onDeviceAvaliable(this.device1);}
+
+                }
+                ,onclickreconnect:function(){
+                    /*重新连接*/
+                    console.log('reconnecting');
+                    this.neterrinfos.setAll('visible',false);
+                    this.onclickswitch();
+                    if(true){//当重新连接时
+                    this.onBleDataRecoverValid();}
+                }
+                ,onclickexit:function(){
+                    /*退出游戏*/
+                    console.log('exiting');
+
+                },
+                onclickenter:function(){
+                    /*确认按钮*/
+                    console.log('enter');
+         
+                }
+                ,onclickreplay:function(){
+                    /*在玩一次*/console.log('replay');this.rankinfos.setAll('visible',false);
+                    this.introduction=game.add.image(0,0,'introduction');
+                    this.startbutton=game.add.button(game.width/2-130,game.height/2+100,'startbutton',this.onclickstart,this,0,0,0);//重新载入开始页面
+            }
+            ,onclickreport:function(){
+                    /*查看报告*/console.log('report');}
+            ,onclickpagedown:function(){
+                    var p=0;
+                    /*切换设备菜单中的下拉菜单按钮*/console.log('pagedown');
+                    if((this.device1.length>4)&&(this.pagedowncount<this.device1.length-5))  //必须长度高于5 下界计数器决定
+                        {
+                            for(;p<5;p++)
+                   { this.devicename[p].setText(this.device1[p+1].name);console.log(this.pagedowncount);}
+                        this.pagedowncount++;
+                        }
+
+            },onclickrefresh:function(){
+                    /*切换设备菜单中的刷新按钮*/
+                    //console.log('refresh');
+                    var m=0;
+                    for(m=0;m<5&&m<this.device1.length;m++)
+                    { this.devicename[m].setText(this.device1[m].name);}
+                    for(;m<5;m++)this.devicename[m]=null;
+                    this.pagedowncount=0;
+            },onclickreturn:function(){
+                    /*return按钮*/
+                    },
+                onbuyinfo:function(){
+                    //购买脑电设备提示
+                    //console.log('buy');
+                    this.buys.setAll('visible',true);
+            },onbuy2info:function(){                    //购买心率设备提示
+                    console.log('buy2');
+                    this.buys2.setAll('visible',true);}
+            };
+
+            /*控制器模块*/
+      /*      function Controller() {
+            }
+            Controller.psy=(function(){
+                if(api.systemType === 'ios'){
+                    return api.require('psyToolsForiOS');
+                }else{
+                    return api.require('psytools');
+                }
+            })();
+            Controller.device=[];
+            Controller.bootSuccess = function(game) {
+                //初始化蓝牙
+                console.log('控制器被调用了');
+                Controller.init(game);
+            };
+
+            //初始化方法, 监听数据/蓝牙
+            Controller.init = function (game) {
+                console.log('init被调用了！');
+                Controller.psy.getBlueState(function(ret,err){
+                    console.log(JSON.stringify(ret));
+                    var obj=game.state.getCurrentState();
+                    console.log(typeof ret.data);
+                    if(ret.data===5){
+                        obj.onWaiting('蓝牙开启');
+                    }else{
+                        obj.onBleError(ret.data);
+                    }
+                });
+            };
+
+            //推送数据的方法
+            Controller.prototype.connect = function () {
+                //调用iOS模块的连接方法
+                this.psy.connect(function (data) {
+                    //数据来了
+                    this.game.dataHandler(data);
+                });
+            };*/
+
+        //    var controller=new Controller();
+            game.state.add('boot',game.Mystates.boot);
+            game.state.add('load',game.Mystates.load);
+            game.state.add('startmenu',game.Mystates.startmenu);
+            game.state.add('main',game.Mystates.main);
+            console.log('1');
+            game.state.start('boot');
+ // }
+    </script>
+</html>
